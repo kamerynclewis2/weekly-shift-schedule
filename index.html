@@ -762,7 +762,10 @@
       background: var(--surface);
       border-radius: var(--radius);
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
+      max-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
       box-shadow: var(--shadow-lg);
       overflow: hidden;
       transform: translateY(10px) scale(0.98);
@@ -779,6 +782,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .modal-header h3 {
@@ -798,6 +802,32 @@
 
     .modal-body {
       padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      max-height: calc(85vh - 120px);
+      scrollbar-width: thin;
+      scrollbar-color: #94a3b8 #f1f5f9;
+      overscroll-behavior: contain;
+    }
+
+    /* Modal vertical scroll slider / scrollbar styling */
+    .modal-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+      border: 2px solid #f1f5f9;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
     }
 
     .modal-footer {
@@ -807,20 +837,30 @@
       display: flex;
       justify-content: flex-end;
       gap: 10px;
+      flex-shrink: 0;
+      position: sticky;
+      bottom: 0;
+      z-index: 5;
     }
 
-    /* SHIFT SELECTOR OPTIONS IN MODAL */
+    /* SHIFT SELECTOR OPTIONS IN MODAL (2-Column Grid on Desktop) */
     .shift-options-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
+    }
+
+    @media (max-width: 460px) {
+      .shift-options-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .shift-option-btn {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 14px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border);
       background: var(--surface);
@@ -923,6 +963,102 @@
 
     .form-error.show {
       display: block;
+    }
+
+    /* CUSTOM SHIFT DURATION SLIDER COMPONENT */
+    .custom-slider-block {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin: 10px 0;
+    }
+
+    .custom-slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .custom-slider-label-row label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .custom-slider-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .custom-slider-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slider-tick {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .custom-range-slider {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      background: #e2e8f0;
+      outline: none;
+    }
+
+    .custom-hours-direct-input {
+      width: 58px;
+      padding: 4px 6px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-align: center;
+      border: 1px solid var(--border-dark);
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    .custom-hours-direct-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .slider-quick-pills {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .quick-hour-chip {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .quick-hour-chip:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: #bfdbfe;
     }
 
     /* TOAST MESSAGE */
@@ -1305,11 +1441,28 @@
             <label for="customLabel">Label / Notes</label>
             <input type="text" id="customLabel" placeholder="e.g. Training, Inventory" maxlength="20" value="Custom">
           </div>
-          <div class="input-field">
-            <label for="customHours">Hours (1-12)</label>
-            <input type="number" id="customHours" min="1" max="16" step="0.5" value="6">
+        </div>
+
+        <!-- Custom Shift Duration Slider -->
+        <div class="custom-slider-block">
+          <div class="custom-slider-label-row">
+            <label for="customHoursSlider">Shift Length (Slider)</label>
+            <span class="custom-slider-badge" id="customHoursSliderBadge">6.0 hrs</span>
+          </div>
+          <div class="custom-slider-controls">
+            <span class="slider-tick">1h</span>
+            <input type="range" class="custom-range-slider" id="customHoursSlider" min="1" max="14" step="0.5" value="6">
+            <span class="slider-tick">14h</span>
+            <input type="number" id="customHours" min="0.5" max="16" step="0.5" value="6" class="custom-hours-direct-input" title="Direct hours input">
+          </div>
+          <div class="slider-quick-pills">
+            <button type="button" class="quick-hour-chip" data-hrs="4">4h</button>
+            <button type="button" class="quick-hour-chip" data-hrs="6">6h</button>
+            <button type="button" class="quick-hour-chip" data-hrs="8">8h</button>
+            <button type="button" class="quick-hour-chip" data-hrs="10">10h</button>
           </div>
         </div>
+
         <div class="input-row">
           <div class="input-field">
             <label for="customStart">Start Time</label>
@@ -1320,7 +1473,7 @@
             <input type="time" id="customEnd" value="15:00">
           </div>
         </div>
-        <div class="form-error" id="customTimeError">Please enter valid shift hours between 1 and 16.</div>
+        <div class="form-error" id="customTimeError">Please enter valid shift hours between 0.5 and 16.</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1893,17 +2046,67 @@
     const customError = document.getElementById('customTimeError');
     customError.classList.remove('show');
 
+    const initHours = currentShift.type === 'CUSTOM' ? (currentShift.hours || 6) : 6;
+    setCustomHoursUI(initHours);
+
     if (selectedShiftType === 'CUSTOM') {
       customGroup.classList.add('show');
       document.getElementById('customLabel').value = currentShift.label || 'Custom';
-      document.getElementById('customHours').value = currentShift.hours || 6;
       if (currentShift.start) document.getElementById('customStart').value = currentShift.start;
       if (currentShift.end) document.getElementById('customEnd').value = currentShift.end;
+      setTimeout(() => {
+        customGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
     } else {
       customGroup.classList.remove('show');
     }
 
     document.getElementById('shiftModalOverlay').classList.add('open');
+  }
+
+  function setCustomHoursUI(hours) {
+    const h = parseFloat(hours) || 6;
+    const slider = document.getElementById('customHoursSlider');
+    const numInput = document.getElementById('customHours');
+    const badge = document.getElementById('customHoursSliderBadge');
+    const preview = document.getElementById('customHrsPreview');
+
+    if (slider) slider.value = Math.min(14, Math.max(1, h));
+    if (numInput) numInput.value = h;
+    if (badge) badge.textContent = `${h.toFixed(1)} hrs`;
+    if (preview) preview.textContent = `${h}h`;
+  }
+
+  function syncEndTimeFromStartAndHours() {
+    const startInput = document.getElementById('customStart');
+    const endInput = document.getElementById('customEnd');
+    const numInput = document.getElementById('customHours');
+    if (!startInput || !endInput || !numInput || !startInput.value) return;
+
+    const [sh, sm] = startInput.value.split(':').map(Number);
+    const hours = parseFloat(numInput.value) || 6;
+    const totalMinutes = Math.round(sh * 60 + sm + hours * 60);
+
+    const endH = Math.floor(totalMinutes / 60) % 24;
+    const endM = totalMinutes % 60;
+    endInput.value = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+  }
+
+  function calculateHoursFromTimes() {
+    const startInput = document.getElementById('customStart');
+    const endInput = document.getElementById('customEnd');
+    if (!startInput || !endInput || !startInput.value || !endInput.value) return;
+
+    const [sh, sm] = startInput.value.split(':').map(Number);
+    const [eh, em] = endInput.value.split(':').map(Number);
+
+    let diff = (eh * 60 + em) - (sh * 60 + sm);
+    if (diff < 0) diff += 24 * 60; // Crosses midnight
+
+    const calculatedHours = Math.round((diff / 60) * 2) / 2; // Round to nearest 0.5h
+    if (calculatedHours >= 0.5 && calculatedHours <= 16) {
+      setCustomHoursUI(calculatedHours);
+    }
   }
 
   function highlightShiftOptionBtn(type) {
@@ -2235,11 +2438,52 @@
         const customGroup = document.getElementById('customInputsGroup');
         if (type === 'CUSTOM') {
           customGroup.classList.add('show');
+          setTimeout(() => {
+            customGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 50);
         } else {
           customGroup.classList.remove('show');
         }
       });
     });
+
+    // Custom hours slider & controls wiring
+    const hoursSlider = document.getElementById('customHoursSlider');
+    const hoursNumInput = document.getElementById('customHours');
+    const customStartInput = document.getElementById('customStart');
+    const customEndInput = document.getElementById('customEnd');
+
+    if (hoursSlider && hoursNumInput) {
+      hoursSlider.addEventListener('input', () => {
+        const val = parseFloat(hoursSlider.value);
+        setCustomHoursUI(val);
+        syncEndTimeFromStartAndHours();
+      });
+
+      hoursNumInput.addEventListener('input', () => {
+        const val = parseFloat(hoursNumInput.value);
+        if (!isNaN(val) && val >= 0.5 && val <= 16) {
+          setCustomHoursUI(val);
+          syncEndTimeFromStartAndHours();
+        }
+      });
+    }
+
+    document.querySelectorAll('.quick-hour-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const hrs = parseFloat(chip.getAttribute('data-hrs'));
+        setCustomHoursUI(hrs);
+        syncEndTimeFromStartAndHours();
+      });
+    });
+
+    if (customStartInput) {
+      customStartInput.addEventListener('change', syncEndTimeFromStartAndHours);
+    }
+    if (customEndInput) {
+      customEndInput.addEventListener('change', calculateHoursFromTimes);
+    }
 
     document.getElementById('btnCloseShiftModal').addEventListener('click', closeShiftModal);
     document.getElementById('btnCancelShift').addEventListener('click', closeShiftModal);
